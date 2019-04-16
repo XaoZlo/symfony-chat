@@ -21,10 +21,11 @@ class Message implements \JsonSerializable
     {
         return [
             'user_id' => $this->getLogin()->getId(),
+            'user_login' => $this->getLogin()->getLogin(),
             'message_id' => $this->getId(),
             'message' => $this->getMessage(),
             'timestamp' => $this->getDatetime()->getTimestamp(),
-            'datetime' => $this->getDatetime()
+            'datetime_formatted' => date_format($this->getDatetime(), 'm/d/Y H:i:s')
         ];
     }
 

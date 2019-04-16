@@ -25,14 +25,10 @@ class ChatWindowController extends AbstractController
 
         $messagesArray = [];
         foreach ($messages as $message) {
-            $messagesArray[] = [
-                'text' => $message->getMessage(),
-                'time' => date_format($message->getDatetime(), 'd/m/Y H:i:s'),
-                'login' => $message->getLogin()->getLogin()
-            ];
+            $messagesArray[] = $message->jsonSerialize();
         }
-
         return $this->render('chat_window/index.html.twig', [
+            //'messages' => array_reverse($messagesArray),
             'messages' => array_reverse($messagesArray),
         ]);
     }

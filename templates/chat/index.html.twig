@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+{% block title %}Чат{% endblock %}
+{% block body %}
+    <p>Привет {{ login }}</p>
+    {% if error is defined %}
+        <p>{{ error }}</p>
+    {% endif %}
+    <iframe id="chatWindow" src="{{ path('chat_window') }}#end" width="500" height="250" align="left">
+    </iframe>
+
+    {{ form(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        function updateIframe(){
+            var request = new XMLHttpRequest();
+
+            request.addEventListener('readystatechange', function() {
+                if (request.readyState == 4 && request.status == 200) {
+                    document.getElementById('chatWindow').contentWindow.document.body.innerHTML = request.responseText;
+                    setTimeout('updateIframe()', 1000);
+                }
+            });
+            request.open("GET", "{{ path('chat_window') }}", true);
+            request.send();
+        }
+
+        window.onload = function () {
+            updateIframe();
+        }
+    </script>
+{% endblock %}

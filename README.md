@@ -37,7 +37,7 @@ ChatController отрисовывает страницу с чатом и доб
 
 ChatWindowController выбирает из базы сообщения и отрисовывает их на странице /chat/window.
 
-ApiController возвращает json-строки
+ApiController возвращает json-строки.
 Работу ApiController можно посмотреть на страницах:
  
 [localhost/get/users](http://localhost/get/users) - Возвращает всех пользователей и их сообщения.

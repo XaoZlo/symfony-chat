@@ -10,4 +10,6 @@
 
 ###> another files ###
 /.idea/
+composer.lock
+/docker/logs/
 ###< another files ###

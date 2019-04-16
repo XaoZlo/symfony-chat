@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+    php:
+        build: docker/php
+        container_name: php
+        volumes:
+            - ./:/var/www/symfony:cached
+            - ./docker/logs/symfony:/var/www/symfony/var/log:cached
+            - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+        working_dir: /var/www/symfony
+    nginx:
+        build: ./docker/nginx
+        container_name: nginx
+        ports:
+            - 80:80
+        volumes_from:
+            - php
+        volumes:
+            - ./docker/logs/nginx/:/var/log/nginx
+            - ./docker/nginx/symfony.conf:/etc/nginx/sites-available/symfony.conf:ro

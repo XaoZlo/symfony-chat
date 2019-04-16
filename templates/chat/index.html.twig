@@ -28,6 +28,28 @@
 
         window.onload = function () {
             updateIframe();
+
+            var formButton = document.forms['form'].elements['form_send'];
+
+            formButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                var data = new FormData(document.forms['form']);
+                console.log(data);
+                if (data) {
+                    var request = new XMLHttpRequest();
+
+                    request.open('POST', '{{ path('chat') }}');
+                    request.responseType = 'json';
+                    request.addEventListener('readystatechange', function () {
+                        if (request.readyState == 4 && request.status == 200) {
+                            if (request.response.status == 'error') {
+                                alert(request.response.msg);
+                            }
+                        }
+                    });
+                    request.send(data);
+                }
+            });
         }
     </script>
 {% endblock %}

@@ -5,12 +5,11 @@ namespace App\Controller;
 use App\Entity\Message;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class ChatController extends AbstractController
 {
@@ -19,14 +18,17 @@ class ChatController extends AbstractController
      */
     public function index(Request $request)
     {
-        $session = $this->get('session');
-        if (empty($session->get('login'))) {
+        $session = $request->getSession();
+        $userId = $session->get('user_id');
+        if (empty($userId)) {
             return $this->redirectToRoute('auth', [
                 'error' => 'Пожалуйста, авторизуйтесь'
             ]);
         }
-        $login = $session->get('login');
-
+        $repository = $this->getDoctrine()->getRepository(User::class);
+        $user = $repository->findOneBy([
+            'id' => $userId
+        ]);
         $messages = new Message();
 
         $form = $this->createFormBuilder($messages)
@@ -43,37 +45,39 @@ class ChatController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()){
 
             $now = new \DateTime();
-            /**
-             * Если юзер отправял сообщение в течение 30 секунд, то выдаем ошибку
-             */
             $timestamp = $now->getTimestamp();
-            $lastMessage = $this->getDoctrine()->getRepository(Message::class)->findOneBy([
-                'login' => $login
-            ]);
-
-            $lastMessageTimestamp = $lastMessage->getDatetime()->getTimestamp();
-            if ($timestamp-30 < $lastMessageTimestamp) {
-                $error = 'Сообщения можно отправлять раз в 30 секунд.';
-                return $this->render('chat/index.html.twig', [
-                    'login' => $login->getLogin(),
-                    'error' => $error,
-                    'form' => $form->createView()
-                ]);
+            $lastMessage = $this->getDoctrine()->getRepository(Message::class)->findBy([
+                'login' => $user
+            ], ['datetime' => 'DESC'], 1);
+            if ($lastMessageTimestamp = $lastMessage[0]->getDatetime()->getTimestamp()) {
+                /**
+                 * Если юзер отправял сообщение в течение 30 секунд, то выдаем ошибку
+                 */
+                if ($timestamp - 30 < $lastMessageTimestamp) {
+                    $diff = $lastMessageTimestamp - $timestamp + 30 ;
+                    return new JsonResponse([
+                        'status' => 'error',
+                        'msg' => 'Сообщения можно отправлять раз в 30 секунд. Следующее сообщение через: ' . $diff
+                    ]);
+                }
             }
 
             $message = $form->getData();
             $message->setDatetime($now);
-            $message->setLogin($login);
+            $message->setLogin($user);
 
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($login);
             $entityManager->persist($message);
             $entityManager->flush();
+
+            return new JsonResponse([
+                'status' => 'success'
+            ]);
 
         }
 
         return $this->render('chat/index.html.twig', [
-            'login' => $login->getLogin(),
+            'login' => $user->getLogin(),
             'form' => $form->createView()
         ]);
     }

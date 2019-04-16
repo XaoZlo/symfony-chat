@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AuthController extends AbstractController
@@ -18,8 +17,8 @@ class AuthController extends AbstractController
     public function index(Request $request)
     {
         $error = $request->get('error');
-        $session = $this->get('session');
-        if (!empty($session->get('login'))) {
+        $session = $request->getSession();
+        if (!empty($session->get('user_id'))) {
             return $this->redirectToRoute('chat');
         }
 
@@ -44,7 +43,7 @@ class AuthController extends AbstractController
                 'password' => $userForm->getPassword(),
             ]);
             if(!empty($user)) {
-                $session->set('login', $user);
+                $session->set('user_id', $user->getId());
                 return $this->redirectToRoute('chat');
             } else {
                 $error =  'Неверный логин или пароль';

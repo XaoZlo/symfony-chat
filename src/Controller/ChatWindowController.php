@@ -14,7 +14,7 @@ class ChatWindowController extends AbstractController
     public function index()
     {
         $session = $this->get('session');
-        if (empty($session->get('login'))) {
+        if (empty($session->get('user_id'))) {
             return $this->redirectToRoute('auth', [
                 'error' => 'Пожалуйста, авторизуйтесь'
             ]);

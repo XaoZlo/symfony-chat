@@ -5,6 +5,7 @@
     {% if error is defined %}
         <p>{{ error }}</p>
     {% endif %}
+    <p><a href="?exit=1">Выйти</a> </p>
     <iframe id="chatWindow" src="{{ path('chat_window') }}#end" width="500" height="250" align="left">
     </iframe>
 

@@ -23,8 +23,6 @@ class AuthController extends AbstractController
         }
 
         $user = new User();
-        $user->setlogin('test');
-        $user->setPassword('test');
 
         $form = $this->createFormBuilder($user)
             ->add('login', TextType::class)

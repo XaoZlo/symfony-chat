@@ -12,25 +12,19 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $user = new User();
-        $user->setlogin('test');
-        $user->setPassword('test');
+        $user->setlogin('User_nickname');
+        $user->setPassword('1234');
         $manager->persist($user);
 
         $user2 = new User();
-        $user2->setlogin('test2');
-        $user2->setPassword('test2');
+        $user2->setlogin('Nickname_username');
+        $user2->setPassword('1234');
         $manager->persist($user2);
 
         $msg = new Message();
-        $msg->setLogin($user);
+        $msg->setLogin($user2);
         $msg->setDatetime(new \DateTime());
-        $msg->setMessage('Привет');
-        $manager->persist($msg);
-
-        $msg = new Message();
-        $msg->setLogin($user);
-        $msg->setDatetime(new \DateTime());
-        $msg->setMessage('Как дела?');
+        $msg->setMessage('<script>alert("XSS")</script>');
         $manager->persist($msg);
 
         $msg = new Message();
@@ -40,9 +34,15 @@ class AppFixtures extends Fixture
         $manager->persist($msg);
 
         $msg = new Message();
-        $msg->setLogin($user2);
+        $msg->setLogin($user);
         $msg->setDatetime(new \DateTime());
-        $msg->setMessage('<script>alert("XSS")</script>');
+        $msg->setMessage('Как дела?');
+        $manager->persist($msg);
+
+        $msg = new Message();
+        $msg->setLogin($user);
+        $msg->setDatetime(new \DateTime());
+        $msg->setMessage('Привет');
         $manager->persist($msg);
 
         $manager->flush();

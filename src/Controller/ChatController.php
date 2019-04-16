@@ -19,6 +19,11 @@ class ChatController extends AbstractController
     public function index(Request $request)
     {
         $session = $request->getSession();
+
+        if ($request->get('exit')) {
+            $session->clear();
+        }
+
         $userId = $session->get('user_id');
         if (empty($userId)) {
             return $this->redirectToRoute('auth', [
